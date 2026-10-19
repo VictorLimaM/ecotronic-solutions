@@ -1,70 +1,120 @@
-# ♻️ Ecotronic Solutions
+# Ecotronic — Totem de Descarte (Java + Supabase só para login)
 
-Projeto desenvolvido para a **UPX2 - FACENS**, com o objetivo de incentivar e facilitar o descarte correto de resíduos eletrônicos.
-
-## 💡 Sobre o projeto
-
-O **Ecotronic** é um sistema de coleta de resíduos eletrônicos que utiliza totens para registrar os descartes.
-
-O sistema possui três interfaces principais:
-
-- **Totem:** registro dos descartes eletrônicos.
-- **Usuário:** cadastro, histórico de descartes e Ecodots.
-- **Monitoramento:** acompanhamento dos descartes e dos totens.
-
-## 🛠️ Tecnologias
-
-- HTML
-- CSS
-- JavaScript
-- Tailwind CSS
-- Supabase
-- Chart.js
-- Figma
-
-## 📁 Principais arquivos
-
-```text
-├── totem.html
-├── usuario.html
-├── monitoramento-standalone.html
-├── config.js
-└── README.md
+```
+Navegador (totem / minha conta / monitoramento)
+   │  login nome+senha ──────────────► Supabase Auth   (ÚNICO uso do Supabase)
+   │  Bearer <access_token> / X-Totem-Key
+   ▼
+API Java (Spring Boot)  ──valida o token no Supabase──►
+   │
+   ▼
+Banco de dados (H2 em arquivo; PostgreSQL opcional)   tabelas: perfis, descartes
 ```
 
-## ⚙️ Configuração do Supabase
+O que vive em cada lugar:
 
-Para executar o projeto, é necessário configurar a conexão com o **Supabase** no arquivo `config.js`.
+| Dado | Onde |
+|---|---|
+| E-mail/senha, sessão (login) | Supabase Auth |
+| Perfil, código do totem (token), flag de admin | Banco Java (`perfis`) |
+| Descartes e ecodots | Banco Java (`descartes`) |
+| Sorteio dos ecodots por categoria | Servidor Java (`Categoria.java`) |
 
-### Como obter as credenciais
+## Como rodar
 
-1. Acesse o Supabase e entre no seu projeto.
-2. Vá em **Project Settings**.
-3. Acesse a seção **API**.
-4. Copie a **Project URL**.
-5. Copie a **Publishable key** (ou `anon` / `public`, dependendo da versão do painel).
-6. Abra o arquivo `config.js`.
-7. Substitua os valores indicados pelas credenciais do seu projeto:
+Requisitos: **Java 17+** e **Maven 3.9+**.
 
-```js
-const SUPABASE_URL = "SUA_PROJECT_URL";
-const SUPABASE_ANON_KEY = "SUA_PUBLISHABLE_KEY";
+```bash
+cd backend
+mvn spring-boot:run
 ```
 
-> **Importante:** utilize apenas a chave pública (`Publishable` ou `anon`). Nunca adicione `service_role`, `secret key` ou outras credenciais privadas ao código do frontend ou ao repositório.
+Abra **http://localhost:8080** (totem), `/usuario.html` (Minha Conta) e `/monitoramento.html` (admin).
+As telas ficam em `backend/src/main/resources/static/` e são servidas pela própria API.
+O banco é criado sozinho em `backend/data/ecotronic.mv.db`. Console SQL: http://localhost:8080/h2-console
+(JDBC URL `jdbc:h2:file:./data/ecotronic`, usuário `sa`, senha vazia).
 
-## 🚀 Como executar
+## Usar no celular
 
-Após configurar o Supabase, abra os arquivos HTML no navegador ou utilize uma extensão como o **Live Server** no Visual Studio Code.
+As telas são um **site responsivo instalável (PWA)**: funcionam em qualquer celular com navegador moderno
+(Android/Chrome, iPhone/Safari), sem app de loja. O celular precisa abrir o endereço da API — **`localhost` só
+funciona no próprio computador**.
 
-- `totem.html` — interface do totem
-- `usuario.html` — área do usuário
-- `monitoramento-standalone.html` — painel de monitoramento
+### Opção A — teste rápido pelo Wi-Fi (mesma rede do computador)
+1. Rode `mvn spring-boot:run` no computador.
+2. Descubra o IP dele (`ipconfig` no Windows, `ip a` / `ifconfig` no Linux/Mac), ex.: `192.168.0.25`.
+3. No celular, abra `http://192.168.0.25:8080`.
+4. Se não abrir, libere a porta **8080** no firewall do computador (no Windows: "Permitir um aplicativo" → Java).
+   Em rede de faculdade/empresa o isolamento de clientes pode bloquear; use a Opção B ou o hotspot do celular.
 
-## 🚧 Status
+Em `http://` o login, o totem e o painel funcionam, mas o navegador **não permite instalar** o app na tela inicial.
 
-Projeto em desenvolvimento.
+### Opção B — publicar na internet com HTTPS (funciona em qualquer celular, qualquer rede)
+O projeto já tem `backend/Dockerfile`. Em Render, Railway, Fly.io etc.:
+1. Suba a pasta `backend` (GitHub) e crie um serviço Docker.
+2. Crie um **PostgreSQL** na própria hospedagem (o disco do H2 é apagado a cada deploy) e configure as variáveis:
 
-## 🎓 Projeto acadêmico
+| Variável | Valor |
+|---|---|
+| `DB_URL` | `jdbc:postgresql://HOST:5432/BANCO` |
+| `DB_USER` / `DB_PASSWORD` | credenciais do Postgres |
+| `TOTEM_KEY` | uma chave sua (e a mesma em `TOTEM_API_KEY` no `config.js`) |
+| `ADMIN_EMAILS` | e-mail do admin, ex.: `maria.admin@ecotronic.com` |
 
-Desenvolvido para a **UPX2 - Usina de Projetos Experimentais da FACENS**.
+3. Abra o endereço `https://seu-app...` no celular. Como `API_URL` é vazio (mesma origem), nada mais precisa mudar.
+4. **Instalar:** Android/Chrome → menu ⋮ → "Instalar app"; iPhone/Safari → Compartilhar → "Adicionar à Tela de Início".
+
+### O que foi feito para o celular
+- Tailwind **compilado** (`tailwind.css`, ~14 KB) em vez do script CDN — carrega rápido em aparelhos fracos.
+  Se mudar classes nos HTML/JS: `cd backend/tailwind && npm install && npm run build:css`.
+- `manifest.json`, ícones e `sw.js` (instalável; abre a interface mesmo com rede ruim — os dados sempre vêm da API).
+- Campos com fonte de 16px (o iPhone não dá zoom ao digitar), `100dvh` (barra do navegador), cabeçalho do painel
+  compacto em telas pequenas e botão "Copiar" com alternativa quando não há HTTPS.
+
+## Primeiro administrador
+
+1. Crie uma conta normal em `/usuario.html` (ex.: nome `Maria Admin` → e-mail interno `maria.admin@ecotronic.com`).
+2. Defina `ecotronic.admin-emails=maria.admin@ecotronic.com` em `application.properties`
+   (ou a variável de ambiente `ADMIN_EMAILS`) e reinicie. Ou rode no H2 console:
+   `UPDATE perfis SET is_admin = TRUE WHERE nome = 'Maria Admin';`
+
+## Configuração
+
+| Onde | Chave | Para quê |
+|---|---|---|
+| `application.properties` | `ecotronic.supabase.url` / `anon-key` | projeto Supabase (só login) |
+| `application.properties` | `ecotronic.totem-key` | chave que o totem envia em `X-Totem-Key` |
+| `static/config.js` | `TOTEM_API_KEY`, `TOTEM_ID` | mesma chave do totem, id do totem (`API_URL` já usa a mesma origem) |
+
+Para PostgreSQL, siga o bloco comentado em `application.properties`.
+
+## Endpoints
+
+| Método | Rota | Quem | O que faz |
+|---|---|---|---|
+| GET | `/api/health` | público | verifica se a API está no ar |
+| POST | `/api/totem/validar-token` | totem | `{token}` → `{nome}` (404 se não existir; 429 após 10 erros/min por IP) |
+| POST | `/api/totem/descartes` | totem | `{totemId, categoria, token?}` → sorteia e grava; devolve `{ecodots,...}` |
+| POST | `/api/perfis` | logado | `{nome}` cria o perfil e gera o código de 6 dígitos |
+| GET | `/api/perfis/me` | logado | perfil (nome, token, admin) |
+| PUT | `/api/perfis/me` | logado | `{nome}` altera o nome |
+| POST | `/api/perfis/me/token` | logado | gera novo código (invalida o antigo) |
+| GET | `/api/perfis/me/descartes` | logado | histórico do usuário |
+| GET | `/api/admin/descartes?limit=2000` | admin | todos os descartes (painel) |
+
+Erros sempre voltam como `{"erro": "mensagem"}`.
+
+## Segurança — o que está e o que falta
+
+- A API confirma cada token de login chamando `GET {SUPABASE_URL}/auth/v1/user`, então não é preciso guardar o JWT secret.
+- Dados de admin exigem login **e** `is_admin = true` (verificado no banco a cada chamada).
+- O totem usa uma chave fixa (`X-Totem-Key`) que fica visível no navegador do totem. Em produção, use HTTPS
+  e troque a chave padrão; o ideal é uma chave por totem.
+- Os ecodots são sorteados no servidor, então o navegador não consegue "inventar" pontos.
+- Restrinja o CORS (`WebConfig`) para o seu domínio ao publicar.
+
+## Migração dos dados antigos
+
+As tabelas `perfis`/`descartes` do Supabase deixam de ser usadas (os arquivos `.sql` antigos não são mais necessários).
+Quem já tinha conta no Supabase ganha um perfil novo, com **novo código**, no primeiro login; os descartes antigos
+não são trazidos automaticamente.

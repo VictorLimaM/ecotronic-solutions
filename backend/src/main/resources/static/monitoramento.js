@@ -1,440 +1,10 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ecotronic Solutions · Painel de Monitoramento</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          fundo:        '#FFFFFF',
-          tinta:        '#0F1A16',
-          verdeescuro:  '#12302A',
-          verde:        '#2FAE55',
-          verdeclaro:   '#47C96B',
-          verdefundo:   '#EAF7EE',
-          cinza:        '#6B7280',
-          linha:        '#E7EBE8',
-          vermelho:     '#D2483C',
-        },
-        fontFamily: {
-          display: ['Poppins', 'Arial', 'sans-serif'],
-          body: ['Arial', 'Helvetica', 'sans-serif'],
-        },
-      },
-    },
-  }
-</script>
-
-<style>
-/* ===== Ecotronic — Painel de monitoramento ===== */
-
-.bg-cinza { background-color: #9CA3AF; }
-.bg-vermelho { background-color: #D2483C; }
-
-/* ---- Barra de filtros ---- */
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  gap: 12px;
-  padding: 16px;
-  background: #FAFDFB;
-  border: 1px solid #E7EBE8;
-  border-radius: 14px;
-}
-.filter-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 140px;
-}
-.filter-field label {
-  font-size: 11px;
-  color: #6B7280;
-  font-weight: 600;
-}
-.filter-field select,
-.filter-field input[type="date"] {
-  height: 38px;
-  padding: 0 10px;
-  border: 1px solid #E7EBE8;
-  border-radius: 9px;
-  font-size: 13px;
-  background: #fff;
-  color: #0F1A16;
-}
-.filter-field select:focus,
-.filter-field input:focus {
-  outline: 2px solid #2FAE55;
-  outline-offset: 1px;
-}
-.filter-apply, .filter-clear {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: background .15s ease, border-color .15s ease;
-}
-.filter-apply {
-  background: #2FAE55;
-  color: #fff;
-  border: none;
-}
-.filter-apply:hover { background: #12302A; }
-.filter-clear {
-  background: transparent;
-  color: #6B7280;
-  border: 1px solid #E7EBE8;
-}
-.filter-clear:hover { border-color: #2FAE55; color: #12302A; }
-
-/* ---- KPI cards ---- */
-.kpi-card {
-  background: #fff;
-  border: 1px solid #E7EBE8;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.kpi-icon {
-  width: 34px; height: 34px;
-  border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-.kpi-value {
-  font-family: "Poppins", Arial, sans-serif;
-  font-weight: 600;
-  font-size: 26px;
-  line-height: 1.1;
-  color: #0F1A16;
-}
-.kpi-label {
-  font-size: 12px;
-  color: #6B7280;
-}
-
-/* ---- Gráficos ---- */
-.chart-card {
-  background: #fff;
-  border: 1px solid #E7EBE8;
-  border-radius: 14px;
-  padding: 18px;
-}
-.chart-title {
-  font-family: "Poppins", Arial, sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 14px;
-  color: #0F1A16;
-}
-.chart-wrap { position: relative; height: 240px; }
-
-/* ---- Seções ---- */
-.section-title {
-  font-family: "Poppins", Arial, sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  margin-bottom: 12px;
-  color: #0F1A16;
-}
-
-/* ---- Cartões de totem ---- */
-.totem-card {
-  background: #fff;
-  border: 1px solid #E7EBE8;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.totem-card .totem-name {
-  font-family: "Poppins", Arial, sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.totem-card .totem-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.totem-card .totem-stat {
-  font-size: 12px;
-  color: #6B7280;
-}
-
-/* ---- Tabela ---- */
-.table-wrap {
-  border: 1px solid #E7EBE8;
-  border-radius: 14px;
-  overflow: hidden;
-  overflow-x: auto;
-}
-.records-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-}
-.records-table thead th {
-  text-align: left;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-  color: #6B7280;
-  background: #FAFDFB;
-  padding: 12px 16px;
-  border-bottom: 1px solid #E7EBE8;
-  white-space: nowrap;
-}
-.records-table tbody td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #F1F3F1;
-  color: #0F1A16;
-  white-space: nowrap;
-}
-.records-table tbody tr:last-child td { border-bottom: none; }
-.records-table tbody tr:hover { background: #FAFDFB; }
-.empty-row {
-  text-align: center;
-  color: #6B7280;
-  padding: 28px 16px !important;
-}
-.ecodot-pill {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: #EAF7EE;
-  color: #12302A;
-  font-weight: 600;
-  font-size: 12.5px;
-}
-
-/* ---- Paginação ---- */
-.page-btn {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  border: 1px solid #E7EBE8;
-  color: #12302A;
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color .15s ease, background .15s ease;
-}
-.page-btn:hover:not(:disabled) { border-color: #2FAE55; background: #FAFDFB; }
-.page-btn:disabled { opacity: .35; cursor: not-allowed; }
-
-@media (max-width: 640px) {
-  .filter-field { min-width: 100%; }
-  .filter-apply, .filter-clear { flex: 1; }
-}
-</style>
-</head>
-<body class="bg-fundo text-tinta font-body antialiased overflow-x-hidden">
-
-  <!-- ============ HEADER ============ -->
-  <header class="sticky top-0 z-30 bg-fundo/90 backdrop-blur border-b border-linha">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-5 md:px-8 h-16 md:h-20">
-      <div class="flex items-center gap-3">
-        <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="2" y="6" width="18" height="6" rx="1" fill="#2FAE55"/>
-          <rect x="2" y="17" width="18" height="6" rx="1" fill="#2FAE55"/>
-          <rect x="2" y="28" width="18" height="6" rx="1" fill="#2FAE55"/>
-          <path d="M27 4 L15 22 H24 L20 36 L34 15 H25 L27 4Z" fill="#12302A"/>
-        </svg>
-        <div class="leading-tight">
-          <p class="font-display font-semibold text-[15px] md:text-base tracking-tight">ecotronic</p>
-          <p class="text-[10px] md:text-[11px] text-cinza -mt-0.5">monitoramento</p>
-        </div>
-      </div>
-
-      <div id="headerActions" class="hidden items-center gap-4">
-        <div class="flex items-center gap-2 text-[11px] md:text-xs text-cinza">
-          <span id="statusDot" class="w-2 h-2 rounded-full bg-verde"></span>
-          <span id="statusLabel">Conectado ao Supabase</span>
-        </div>
-        <button id="refreshBtn" class="h-9 px-4 rounded-lg bg-tinta text-white text-xs font-semibold hover:bg-verdeescuro transition-colors flex items-center gap-2">
-          <i class="fa-solid fa-rotate"></i>
-          <span>Atualizar</span>
-        </button>
-        <button id="logoutBtn" class="h-9 px-4 rounded-lg border border-linha text-tinta text-xs font-semibold hover:bg-verdefundo/60 transition-colors flex items-center gap-2">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>Sair</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ============ TELA · LOGIN ADMINISTRATIVO ============ -->
-  <main id="screenAuth" class="max-w-sm mx-auto px-5 pt-16 pb-24">
-    <div class="mb-8 text-center">
-      <span class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-verdefundo text-verdeescuro text-xl mb-4">
-        <i class="fa-solid fa-lock"></i>
-      </span>
-      <p class="text-verde font-semibold text-sm tracking-tight mb-2">Acesso restrito</p>
-      <h1 class="font-display font-semibold text-[24px] leading-[1.15]">Login administrativo</h1>
-      <p class="text-cinza text-[15px] mt-2">Apenas administradores podem ver o painel de monitoramento.</p>
-    </div>
-
-    <div id="authAlert" class="hidden mb-4 rounded-xl bg-vermelhofundo border border-vermelho/30 text-vermelho text-sm px-4 py-3 text-center"></div>
-
-    <form id="authForm" class="flex flex-col gap-4">
-      <div>
-        <label for="authNome" class="text-xs text-cinza block mb-1">Nome de usuário</label>
-        <input id="authNome" type="text" autocomplete="username" required
-          class="w-full h-12 px-4 rounded-xl border border-linha focus:border-verde focus:outline-none" />
-      </div>
-      <div>
-        <label for="authSenha" class="text-xs text-cinza block mb-1">Senha</label>
-        <input id="authSenha" type="password" autocomplete="current-password" required
-          class="w-full h-12 px-4 rounded-xl border border-linha focus:border-verde focus:outline-none" />
-      </div>
-      <button id="authSubmitBtn" type="submit"
-        class="h-12 rounded-xl bg-verde text-white font-semibold text-sm hover:bg-verdeescuro transition-colors flex items-center justify-center gap-2">
-        <span id="authSubmitLabel">Entrar</span>
-        <i class="fa-solid fa-spinner fa-spin hidden" id="authSpinner"></i>
-      </button>
-    </form>
-  </main>
-
-  <div id="screenDashboard" class="hidden">
-  <main class="max-w-7xl mx-auto px-5 md:px-8 pt-8 pb-20">
-
-    <div class="mb-7 md:mb-9">
-      <p class="text-verde font-semibold text-sm tracking-tight mb-2">Painel administrativo</p>
-      <h1 class="font-display font-semibold text-[26px] leading-[1.15] md:text-[32px]">
-        Monitoramento dos descartes
-      </h1>
-      <p class="text-cinza text-[15px] mt-2 max-w-xl">
-        Acompanhe em tempo real os descartes registrados em todos os totens e o total de ecodots distribuídos.
-      </p>
-    </div>
-
-    <!-- ============ FILTROS ============ -->
-    <div class="filter-bar mb-6">
-      <div class="filter-field">
-        <label for="filterTotem">Totem</label>
-        <select id="filterTotem"><option value="">Todos</option></select>
-      </div>
-      <div class="filter-field">
-        <label for="filterCategoria">Categoria</label>
-        <select id="filterCategoria"><option value="">Todas</option></select>
-      </div>
-      <div class="filter-field">
-        <label for="filterInicio">De</label>
-        <input type="date" id="filterInicio" />
-      </div>
-      <div class="filter-field">
-        <label for="filterFim">Até</label>
-        <input type="date" id="filterFim" />
-      </div>
-      <button id="applyFiltersBtn" class="filter-apply">
-        <i class="fa-solid fa-filter"></i> Filtrar
-      </button>
-      <button id="clearFiltersBtn" class="filter-clear">Limpar</button>
-    </div>
-
-    <!-- ============ KPIs ============ -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-4 mb-8">
-      <div class="kpi-card">
-        <span class="kpi-icon bg-verdefundo text-verdeescuro"><i class="fa-solid fa-recycle"></i></span>
-        <p class="kpi-value" id="kpiTotalDescartes">—</p>
-        <p class="kpi-label">Descartes registrados</p>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-icon bg-verdefundo text-verdeescuro"><i class="fa-solid fa-leaf"></i></span>
-        <p class="kpi-value" id="kpiTotalEcodots">—</p>
-        <p class="kpi-label">Ecodots distribuídos</p>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-icon bg-verdefundo text-verdeescuro"><i class="fa-solid fa-plug-circle-bolt"></i></span>
-        <p class="kpi-value" id="kpiTotens">—</p>
-        <p class="kpi-label">Totens ativos</p>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-icon bg-verdefundo text-verdeescuro"><i class="fa-solid fa-trophy"></i></span>
-        <p class="kpi-value text-[19px] md:text-[22px]" id="kpiTopCategoria">—</p>
-        <p class="kpi-label">Categoria mais descartada</p>
-      </div>
-    </div>
-
-    <!-- ============ GRÁFICOS ============ -->
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-8">
-      <div class="chart-card lg:col-span-3">
-        <p class="chart-title">Descartes por dia</p>
-        <div class="chart-wrap"><canvas id="chartDiario"></canvas></div>
-      </div>
-      <div class="chart-card lg:col-span-2">
-        <p class="chart-title">Ecodots por categoria</p>
-        <div class="chart-wrap"><canvas id="chartCategorias"></canvas></div>
-      </div>
-    </div>
-
-    <!-- ============ TOTENS ============ -->
-    <div class="mb-8">
-      <p class="section-title">Totens</p>
-      <div id="totemGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5"></div>
-    </div>
-
-    <!-- ============ TABELA ============ -->
-    <div>
-      <div class="flex items-center justify-between mb-3">
-        <p class="section-title mb-0">Registros de descarte</p>
-        <p class="text-cinza text-xs" id="tableCount">0 registros</p>
-      </div>
-      <div class="table-wrap">
-        <table class="records-table">
-          <thead>
-            <tr>
-              <th>Data / hora</th>
-              <th>Totem</th>
-              <th>Categoria</th>
-              <th class="text-right">Ecodots</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr><td colspan="4" class="empty-row">Carregando dados…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="flex items-center justify-center gap-3 mt-4" id="pagination">
-        <button id="prevPageBtn" class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
-        <span class="text-xs text-cinza" id="pageLabel">Página 1</span>
-        <button id="nextPageBtn" class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
-      </div>
-    </div>
-
-  </main>
-
-  <footer class="max-w-7xl mx-auto px-5 md:px-8 py-6 text-[11px] text-cinza flex items-center justify-between border-t border-linha">
-    <span>© Ecotronic Solutions</span>
-    <span id="lastUpdateLabel">—</span>
-  </footer>
-  </div><!-- /#screenDashboard -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
-  <script src="config.js"></script>
-  <script>
 // ============================================================
 //  Ecotronic Solutions — Painel de Monitoramento · lógica principal
 // ============================================================
-// SUPABASE_URL, SUPABASE_ANON_KEY e SUPABASE_TABLE vêm de config.js.
+// Carregado como script comum (sem type="module"), no mesmo padrão do
+// totem, para poder ser aberto direto do disco (file://) sem bloqueio
+// de CORS em módulos ES.
+// Supabase só autentica o administrador; os dados vêm da API Java (api.js).
 
 // ---- Mesmo mapa de categorias/ícones do totem (mantido em sincronia) --
 const CATEGORY_META = {
@@ -483,7 +53,10 @@ const logoutBtn = document.getElementById("logoutBtn");
 let db = null;
 try {
   if (window.supabase && SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("SEU-PROJETO")) {
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // storageKey próprio: a sessão do painel admin fica separada da sessão da Minha Conta.
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { storageKey: "ecotronic-admin-auth" },
+    });
   }
 } catch (e) {
   console.warn("Supabase não inicializado:", e);
@@ -535,13 +108,8 @@ async function init() {
 async function loadData() {
   statusLabel.textContent = "Sincronizando…";
   try {
-    const { data, error } = await db
-      .from(SUPABASE_TABLE)
-      .select("*")
-      .order("criado_em", { ascending: false })
-      .limit(2000);
-
-    if (error) throw error;
+    const accessToken = await obterAccessToken(db);
+    const data = await apiFetch("/api/admin/descartes?limit=2000", { accessToken });
 
     allRecords = data || [];
     statusDot.classList.remove("bg-cinza", "bg-vermelho");
@@ -553,6 +121,12 @@ async function loadData() {
     applyFilters();
   } catch (err) {
     console.error("Erro ao buscar descartes:", err);
+    if (err.status === 401 || err.status === 403) {
+      await db.auth.signOut();
+      mostrarLogin();
+      mostrarErroAuth("Sessão expirada ou sem permissão de administrador.");
+      return;
+    }
     statusDot.classList.remove("bg-verde");
     statusDot.classList.add("bg-vermelho");
     statusLabel.textContent = "Falha ao sincronizar";
@@ -674,6 +248,11 @@ function renderTotens() {
 
 // ---- Gráficos ------------------------------------------------------
 function renderCharts() {
+  // Se a biblioteca de gráficos não carregou, o painel continua funcionando sem eles.
+  if (typeof Chart === "undefined") {
+    console.warn("Chart.js não carregou; gráficos desativados.");
+    return;
+  }
   renderChartDiario();
   renderChartCategorias();
 }
@@ -803,7 +382,7 @@ prevPageBtn.addEventListener("click", () => { currentPage -= 1; renderTable(); }
 nextPageBtn.addEventListener("click", () => { currentPage += 1; renderTable(); });
 
 // Atualização automática a cada 30s, sem interromper filtros/paginação.
-setInterval(() => { if (db) loadData(); }, 30000);
+setInterval(() => { if (db && !screenDashboard.classList.contains("hidden")) loadData(); }, 30000);
 
 // ---- Autenticação administrativa ------------------------------------
 function mostrarErroAuth(msg) {
@@ -835,20 +414,39 @@ function mostrarLogin() {
   authForm.reset();
 }
 
-// Confere se o usuário logado tem is_admin = true na tabela perfis.
-// Graças à RLS, um usuário comum só consegue ler o PRÓPRIO perfil —
-// então esta consulta nunca revela dados de outras contas.
-async function ehAdministrador(userId) {
-  const { data, error } = await db
-    .from("perfis")
-    .select("is_admin")
-    .eq("id", userId)
-    .single();
-  if (error) {
+// Pergunta à API Java se o usuário logado tem is_admin = true.
+// A API também bloqueia (403) qualquer chamada de dados feita por não-admin.
+// Se a conta existe no Supabase mas ainda não tem perfil no banco, cria o perfil
+// aqui mesmo (sem precisar passar pela tela de usuário).
+// Devolve { admin: boolean, motivo: string|null }.
+async function verificarAdmin() {
+  try {
+    const { data } = await db.auth.getSession();
+    const user = data?.session?.user;
+    const accessToken = data?.session?.access_token;
+    if (!user || !accessToken) return { admin: false, motivo: "Sessão não encontrada." };
+
+    let perfil;
+    try {
+      perfil = await apiFetch("/api/perfis/me", { accessToken });
+    } catch (err) {
+      if (err.status !== 404) throw err;
+      const nomeMeta = user.user_metadata?.nome;
+      if (!nomeMeta) {
+        return { admin: false, motivo: "Esta conta não tem perfil. Cadastre-se pela tela de usuário." };
+      }
+      perfil = await apiFetch("/api/perfis", { method: "POST", body: { nome: nomeMeta }, accessToken });
+    }
+    if (perfil.admin) return { admin: true, motivo: null };
+    return { admin: false, motivo: "Esta conta não tem permissão de administrador." };
+  } catch (error) {
     console.error("Erro ao verificar permissão de administrador:", error);
-    return false;
+    return { admin: false, motivo: "Não foi possível verificar a conta agora. Tente novamente." };
   }
-  return !!data?.is_admin;
+}
+
+async function ehAdministrador() {
+  return (await verificarAdmin()).admin;
 }
 
 authForm.addEventListener("submit", async (ev) => {
@@ -873,10 +471,10 @@ authForm.addEventListener("submit", async (ev) => {
     const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
     if (error) throw error;
 
-    const admin = await ehAdministrador(data.user.id);
-    if (!admin) {
+    const resultado = await verificarAdmin();
+    if (!resultado.admin) {
       await db.auth.signOut();
-      mostrarErroAuth("Esta conta não tem permissão de administrador.");
+      mostrarErroAuth(resultado.motivo);
       return;
     }
 
@@ -920,6 +518,3 @@ async function initAuthGate() {
 }
 
 initAuthGate();
-  </script>
-</body>
-</html>
